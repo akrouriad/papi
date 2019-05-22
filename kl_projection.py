@@ -22,13 +22,12 @@ class UpdateProjGaussMean:
         self.old_dist = tfp.distributions.MultivariateNormalTriL(self.old_mean, self.old_chol)
 
         # KL violation
-        self.m = self.dm = UpdateProjGaussMean.mean_diff(self.pol.mean, self.old_mean, self.pq)
-        self.r = self.dr = UpdateProjGaussMean.rot_diff(self.pol.covmat, self.pq)
-        self.e = self.de = UpdateProjGaussMean.entropy_diff(self.pol.chol, self.logdetpq)
+        self.m = UpdateProjGaussMean.mean_diff(self.pol.mean, self.old_mean, self.pq)
+        self.r = UpdateProjGaussMean.rot_diff(self.pol.covmat, self.pq)
+        self.e = UpdateProjGaussMean.entropy_diff(self.pol.chol, self.logdetpq)
         self.inter_mean_diff = UpdateProjGaussMean.mean_diff(self.intermediate_mean, self.old_mean, self.pq)
         self.mm = tf.minimum(self.m, self.inter_mean_diff)
         self.init_kl = self.r + self.m + self.e
-        self.tf_og_kl = self.pol.dist.kl_divergence(self.old_dist)
 
         # projecting: matrix rotation/rescaling
         self.eta_rot = (e_kl - self.mm) / tf.maximum(self.r + self.m + self.e, 1e-16)
@@ -53,7 +52,6 @@ class UpdateProjGaussMean:
 
         # building distributions
         self.proj_dist = tfp.distributions.MultivariateNormalTriL(mean, self.chol)
-        self.tf_kl = self.proj_dist.kl_divergence(self.old_dist)
         self.log_prob = tf.transpose(self.proj_dist.log_prob(self.pol.test_action_m))[:, :, None]
 
     @staticmethod
