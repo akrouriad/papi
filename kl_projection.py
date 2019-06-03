@@ -30,7 +30,8 @@ class UpdateProjGaussMean:
         self.init_kl = self.r + self.m + self.e
 
         # projecting: matrix rotation/rescaling
-        self.eta_rot = (e_kl - self.mm) / tf.maximum(self.r + self.m + self.e, 1e-16)
+        self.eta_rot = (e_kl - self.mm) / tf.maximum(self.r + self.m + self.e, 1e-16) # Original self.eta_rot from Alg. 2. Consider trying the one below instead
+        # self.eta_rot = (e_kl - self.mm) / tf.maximum(self.r + self.m + self.e - self.mm, 1e-16) # Slight deviation from Alg. 2 in PAPI's paper. Substracting self.mm in the denominator better balances changing Cov and Mean of distrib.
         ncov = (1 - self.eta_rot) * self.cq + self.eta_rot * self.pol.covmat
         self.do_intercov = self.m + self.r + self.e > e_kl + 1e-6
         self.chol, cov = tf.cond(self.do_intercov, true_fn=lambda: (tf.cholesky(ncov), ncov), false_fn=lambda: (self.pol.chol, self.pol.covmat))
