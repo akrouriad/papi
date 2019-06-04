@@ -1,4 +1,4 @@
-# Linear-Gaussian policy. Includes projection for entropy constraint. Entropy lower bound given by "entrop_profile.target_entropy".
+# MLP-Gaussian policy. Includes projection for entropy constraint. Entropy lower bound given by "entrop_profile.target_entropy".
 
 import tensorflow as tf
 import tensorflow_probability as tfp
